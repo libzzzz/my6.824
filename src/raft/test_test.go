@@ -8,7 +8,10 @@ package raft
 // test with the original before submitting.
 //
 
-import "testing"
+import (
+	"log"
+	"testing"
+)
 import "fmt"
 import "time"
 import "math/rand"
@@ -397,7 +400,9 @@ loop:
 		for j := 0; j < servers; j++ {
 			if t, _ := cfg.rafts[j].GetState(); t != term {
 				// term changed -- can't expect low RPC counts
+				log.Printf("term changed -- can't expect low RPC counts")
 				continue loop
+
 			}
 		}
 
@@ -405,6 +410,7 @@ loop:
 		cmds := []int{}
 		for index := range is {
 			cmd := cfg.wait(index, servers, term)
+			log.Printf("cmd : %v, index : %v, term: %v", cmd, index, term)
 			if ix, ok := cmd.(int); ok {
 				if ix == -1 {
 					// peers have moved on to later terms
@@ -440,6 +446,7 @@ loop:
 				t.Fatalf("cmd %v missing in %v", x, cmds)
 			}
 		}
+		fmt.Printf("cmd nothing missing in %v\n", cmds)
 
 		success = true
 		break
